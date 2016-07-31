@@ -61,9 +61,9 @@
 		<!-- js librarys are imported here, NOT in game content scripts -->
 		<script src="js/three.js"></script>
 		<script src="js/PointerLockControls.js"></script>
-		<!-- none-library scripts dont go in the js folder and are imported here -->
-		<script src="Block.js"></script>
+		<!-- none-library scripts dont go in the js folder and are imported here, however they should be imported by the player-->
 		<script src="Player.js"></script>
+		<script src="js/jquery.min.js"></script>
 		
 		<div id="cords" style="color: #ffffff; background-color: #000000"></div>
 		<div id="blocker">
@@ -305,15 +305,15 @@
 				
 				
 				
-				
-				
 				*/
+				var light = new THREE.AmbientLight( 0x404040 ); // soft white light
+				scene.add( light );
+				
 		        try{
 		        	loader.load( 'models/p90/p90.json', function ( geometry, materials ) {
-		        			var texture = THREE.ImageUtils.loadTexture("models/p90/Tex_0006_1.jpg");
+		        			var texture = THREE.ImageUtils.loadTexture("models/p90/P90.jpg");
 							var mat = new THREE.MeshBasicMaterial({color:0xfffffff,map:texture, morphTargets: true});
-							//var mat = new THREE.MeshBasicMaterial( materials );
-		    				var mesh = new THREE.Mesh( geometry, mat);
+							var mat = THREE.MeshFaceMaterial( materials );
 		    				mesh.scale.set( .1, .1, .1 );
 		    				mesh.position.y=10;
 		    			    objects.push( mesh );
