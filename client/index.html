@@ -61,17 +61,14 @@
 		<!-- js librarys are imported here, NOT in game content scripts -->
 		<script src="js/three.js"></script>
 		<script src="js/PointerLockControls.js"></script>
-		<!-- none-library scripts dont go in the js folder and are imported here, however they should be imported by the player-->
-		<script src="Player.js"></script>
 		<script src="js/jquery.min.js"></script>
-		
 		<div id="cords" style="color: #ffffff; background-color: #000000"></div>
 		<div id="blocker">
 
 			<div id="instructions">
 				<span style="font-size:40px">Click to play</span>
 				<br />
-				(W, A, S, D = Move, SPACE = Jump, MOUSE = Look around)
+				(W, A, S, D or arrow keys = Move, SPACE = Jump, MOUSE = Look around)
 			</div>
 
 		</div>
@@ -81,18 +78,12 @@
 			var geometry, material, mesh;
 			var controls;
     		var mass = 50;
-			var objects = [];
-
-			var raycasterDown;
-			var raycasterUP;
-			var raycasterRight;
-			var raycasterLeft;
+			var models2;
 			var PlayerMesh;
 
 			var blocker = document.getElementById( 'blocker' );
 			var instructions = document.getElementById( 'instructions' );
 
-			// http://www.html5rocks.com/en/tutorials/pointerlock/intro/
 
 			var havePointerLock = 'pointerLockElement' in document || 'mozPointerLockElement' in document || 'webkitPointerLockElement' in document;
 
@@ -201,10 +192,6 @@
 				scene = new THREE.Scene();
 				scene.fog = new THREE.Fog( 0xffffff, 0, 750 );
 
-				var light = new THREE.HemisphereLight( 0xeeeeff, 0x777788, 0.75 );
-				light.position.set( 0.5, 1, 0.75 );
-				scene.add( light );
-
 				controls = new THREE.PointerLockControls( camera );
 				scene.add( controls.getObject() );
 
@@ -271,9 +258,6 @@
 				document.addEventListener( 'keydown', onKeyDown, false );
 				document.addEventListener( 'keyup', onKeyUp, false );
 
-				raycasterDown = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, - 1, 0 ), 0, 10 );
-				raycasterUP = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, 1, 0 ), 0, 10 );
-				raycasterLeft = new THREE.Raycaster( new THREE.Vector3(), new THREE.Vector3( 0, 0, 0 ), 0, 10 );
 				// floor
 				geometry = new THREE.PlaneGeometry( 2000, 2000, 100, 100 );
 				geometry.rotateX( - Math.PI / 2 );
@@ -295,49 +279,23 @@
 				}
 				material = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors } );
 				mesh = new THREE.Mesh( geometry, material );
-				//objects.push( mesh );
-				scene.add(mesh);
-				// objects
-				/*
-				you just added a Texture! work on the bounding boxes.
-				you wanted to make a java rendering engine library
+				scene.add(mesh)
 				
-				
-				
-				
-				*/
-				var light = new THREE.AmbientLight( 0x404040 ); // soft white light
+				var light = new THREE.AmbientLight( 0x404040 );
 				scene.add( light );
 				
-		        try{
-		        	loader.load( 'models/p90/p90.json', function ( geometry, materials ) {
-		        			var texture = THREE.ImageUtils.loadTexture("models/p90/P90.jpg");
-							var mat = new THREE.MeshBasicMaterial({color:0xfffffff,map:texture, morphTargets: true});
-							var mat = THREE.MeshFaceMaterial( materials );
-		    				mesh.scale.set( .1, .1, .1 );
-		    				mesh.position.y=10;
-		    			    objects.push( mesh );
-		    				scene.add(mesh);
-					}, "models/p90");
-		        }catch(error){
-		        	console.log("error loading models: "+error);
-		        }
+				models2 = new Item("models/P90.json","models/P90.jpg",function(mesh){
+					mesh.position.y=10;
+					mesh.scale.set(.1,.1,.1);
+				});
+				models2.load();
 		        //player
 		        
 				geometry = new THREE.CubeGeometry(1,1,1);
 				material = new THREE.MeshBasicMaterial({color : 0x000000});
 				PlayerMesh = new THREE.Mesh(geometry, material);
-				//objects.push(PlayerMesh);
 				scene.add(PlayerMesh);
-		        /*
-		                		for(var i = 0; i<objects.length; i++ ){
-        			console.log("loaded: "+objects[1].position+" with index "+i);
-        			scene.add(objects[1]);
-        		}
-        		*/
-        							    for(var i = 0; i<objects.length; i++ ){
-					    	console.log(objects[i]);
-					    }
+
 				renderer = new THREE.WebGLRenderer();
 				renderer.setClearColor( 0xffffff );
 				renderer.setPixelRatio( window.devicePixelRatio );
@@ -372,12 +330,6 @@
 				requestAnimationFrame( animate );
 
 				if ( controlsEnabled ) {  
-					/*
-					raycasterDown.ray.origin.copy( controls.getObject().position );
-					raycasterDown.ray.origin.y -= 10;
-					var isOnObject = raycasterDown.intersectObjects( objects ).length > 0;
-					var isUnderObject = raycasterDown.intersectObjects( objects ).length > 0;
-					*/
 					var time = performance.now();
 					var delta = ( time - prevTime ) / 1000;
 
@@ -387,62 +339,68 @@
 					velocity.y -= 9.8 * mass * delta;
 
 					if ( moveForward ) velocity.z -= 400.0 * delta;
-					if ( moveBackward ) velocity.z += 400.0 * delta;
+					if ( moveBackward ) velocity.z += 400.0 * delta; 
 
 					if ( moveLeft ) velocity.x -= 400.0 * delta;
 					if ( moveRight ) velocity.x += 400.0 * delta;
-					//
-					//
-					//
-					//boxes
-					for (var vertexIndex = 0; vertexIndex < PlayerMesh.geometry.vertices.length; vertexIndex++)
-					{       
-					    var localVertex = PlayerMesh.geometry.vertices[vertexIndex].clone();
-					    var globalVertex = localVertex.applyMatrix4( PlayerMesh.matrix );
-					    var directionVector = globalVertex.sub( camera.position );
-					
-					    var ray = new THREE.Raycaster( PlayerMesh.position, directionVector.clone().normalize() );
-					    var collisionResults = ray.intersectObjects( objects );
-
-					    if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() ) 
-						{
-							for(var i = 0; i<collisionResults.length; i++ ){
-								if(!((collisionResults[i]).position == undefined)){
-									document.getElementById("cords").innerHTML += "HIT "+(collisionResults[i]).position+" ";
-								}
-							}
-					    }
-					}
-					
-					
-					//
-					//
-					//
-					//
 					controls.getObject().translateX( velocity.x * delta );
 					controls.getObject().translateY( velocity.y * delta );
 					controls.getObject().translateZ( velocity.z * delta );
 					
 					if ( controls.getObject().position.y < 10 ) {
-
 						velocity.y = 0;
 						controls.getObject().position.y = 10;
 
 						canJump = true;
 
 					}
+					//console.log(models2);
 					PlayerMesh.position = camera.position;
 					prevTime = time;
-					if(document.getElementById("cords").innerHTML.search("HIT")==-1){
-						document.getElementById("cords").innerHTML=("z: "+Math.floor(controls.getObject().position.z)+ " y: "+Math.floor(controls.getObject().position.y)+" z: "+Math.floor(controls.getObject().position.z));
-					}else{
-						document.getElementById("cords").innerHTML+=("z: "+Math.floor(controls.getObject().position.z)+ " y: "+Math.floor(controls.getObject().position.y)+" z: "+Math.floor(controls.getObject().position.z));
-					}
+					document.getElementById("cords").innerHTML=("x: "+Math.floor(controls.getObject().position.x)+ " y: "+Math.floor(controls.getObject().position.y)+" z: "+Math.floor(controls.getObject().position.z));
 				}
 
-				renderer.render( scene, camera );
-
+				renderer.render( scene, camera );	
+				
 			}
+			
+			function Model(json, texture, edits){
+				var mesh;
+				this.getMesh = function(){
+					return mesh;
+				};
+				this.load = function(){
+					try{
+					loader.load( json, function ( geometry, materials ) {
+				        		var tex = THREE.ImageUtils.loadTexture(texture);
+								var mat = new THREE.MeshBasicMaterial({color:0xfffffff,map:tex, morphTargets: true});
+								this.mesh = new THREE.Mesh( geometry, mat );
+								scene.add(this.mesh);
+					});
+				}catch(error){
+			        	console.log("error wloading models: "+error);
+			        }
+			    };
+			    //attempt mtl texture load
+			    this.loadMTL = function(){
+					try{
+					loader.load( json, function ( geometry, materials ) {
+								this.mesh = new THREE.Mesh( geometry, material[1] );
+								scene.add(this.mesh);
+					});
+				}catch(error){
+			        	console.log("error wloading models: "+error);
+			        }
+			    };
+				}
+				
+				function removeModel(object) {
+    				var selectedObject = scene.getObjectByName(object.name);
+    				scene.remove( selectedObject );
+    				animate();
+				}
 		</script>
 	</body>
 </html>
+		<!-- none-library scripts dont go in the js folder and are imported here, however they should be imported by the player-->
+		<script src="Player.js"></script>

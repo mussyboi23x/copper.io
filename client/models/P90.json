@@ -3,7 +3,7 @@
     "metadata" :
     {
         "formatVersion" : 3.1,
-        "sourceFile"    : "P90.obj",
+        "sourceFile"    : "p90.obj",
         "generatedBy"   : "OBJConverter",
         "vertices"      : 7444,
         "faces"         : 6748,

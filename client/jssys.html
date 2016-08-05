@@ -1,0 +1,44 @@
+
+<script src="js/three.js"></script>
+<script src="js/PointerLockControls.js"></script>
+<script>
+/*
+global THREE
+
+*/
+Jsonloader = new THREE.JSONLoader();
+
+Objects = [];
+
+function Gameloop(){
+    
+}
+function init(){
+    
+}
+function removeEntity(object) {
+    var selectedObject = scene.getObjectByName(object.name);
+    scene.remove( selectedObject );
+    animate();
+}
+/**
+ * adds everything into the scene again.
+ */
+function reRender(){
+    
+}
+function addMesh(mesh){
+    Objects.push(mesh);
+}
+function Model(json, texture){
+	try{
+        Jsonloader.load( json, function ( geometry, materials ) {
+        	var tex = THREE.ImageUtils.loadTexture(texture);
+			var mat = new THREE.MeshBasicMaterial({map:tex, morphTargets: true});
+	       addMesh(THREE.Mesh( geometry, [mat,materials]));
+	    });
+    }catch(error){
+	    console.log("error loading model: "+error);
+    }
+}
+</script>
