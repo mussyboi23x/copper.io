@@ -62,6 +62,8 @@
 		<script src="js/three.js"></script>
 		<script src="js/PointerLockControls.js"></script>
 		<script src="js/jquery.min.js"></script>
+		<script src="item.js"></script>
+		<script src="Player.js"></script>
 		<div id="cords" style="color: #ffffff; background-color: #000000"></div>
 		<div id="blocker">
 
@@ -284,11 +286,8 @@
 				var light = new THREE.AmbientLight( 0x404040 );
 				scene.add( light );
 				
-				models2 = new Item("models/P90.json","models/P90.jpg",function(mesh){
-					mesh.position.y=10;
-					mesh.scale.set(.1,.1,.1);
-				});
-				models2.load();
+				models2 = new Item(2, "p90", new Model("models/P90.json","models/P90.jpg"));
+				models2.loadModel();
 		        //player
 		        
 				geometry = new THREE.CubeGeometry(1,1,1);
@@ -364,7 +363,7 @@
 				
 			}
 			
-			function Model(json, texture, edits){
+			function Model(json, texture){
 				var mesh;
 				this.getMesh = function(){
 					return mesh;
@@ -403,4 +402,3 @@
 	</body>
 </html>
 		<!-- none-library scripts dont go in the js folder and are imported here, however they should be imported by the player-->
-		<script src="Player.js"></script>

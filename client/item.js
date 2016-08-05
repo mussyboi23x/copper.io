@@ -6,17 +6,21 @@ function Item(id, name, model){
         return name;
     }
     this.setAction = function(code){
-        code();
+        this.action = code();
     }
     this.pickUp = function(Player){
         //?
     }
-    this.putDown = new function(Player){
+    this.putDown = function(Player){
         //?
     }
+    this.doAction = function(){
+        if(this.action() === undefined){
+            this.action();
+        }
+    }
     this.removeModel = function() {
-    	var oldModel = scene.getObjectByName(this.model.name);
-    	scene.remove( oldModel );
+    	scene.remove( this.model );
     	animate();
 	}
 }
