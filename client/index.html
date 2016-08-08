@@ -261,6 +261,7 @@
 				document.addEventListener( 'keyup', onKeyUp, false );
 
 				// floor
+				/*
 				geometry = new THREE.PlaneGeometry( 2000, 2000, 100, 100 );
 				geometry.rotateX( - Math.PI / 2 );
 				for ( var i = 0, l = geometry.vertices.length; i < l; i ++ ) {
@@ -281,17 +282,25 @@
 				}
 				material = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors } );
 				mesh = new THREE.Mesh( geometry, material );
-				scene.add(mesh)
+				//scene.add(mesh)
+				*/
 				
 				var light = new THREE.AmbientLight( 0x404040 );
 				scene.add( light );
 				
-				models2 = new Item(2, "p90", new Model("models/P90.json","models/P90.jpg"));
-				models2.loadModel();
+				var model = new Item(1, "p90", new Model("models/P90.json","models/P90.jpg"));
+				model.loadModel();
+				model.editModel(function(Model){
+					console.log(Model.getMesh());
+				});
+				console.log(model);
+				console.log(model.getModel());
+				console.log(model.getModel().getMesh());
+				
 		        //player
 		        
-				geometry = new THREE.CubeGeometry(1,1,1);
-				material = new THREE.MeshBasicMaterial({color : 0x000000});
+				geometry = new THREE.CubeGeometry(10,1,10);
+				material = new THREE.MeshLambertMaterial({color : 0x000000});
 				PlayerMesh = new THREE.Mesh(geometry, material);
 				scene.add(PlayerMesh);
 
@@ -354,7 +363,7 @@
 
 					}
 					//console.log(models2);
-					PlayerMesh.position = camera.position;
+					PlayerMesh.position = controls.position;
 					prevTime = time;
 					document.getElementById("cords").innerHTML=("x: "+Math.floor(controls.getObject().position.x)+ " y: "+Math.floor(controls.getObject().position.y)+" z: "+Math.floor(controls.getObject().position.z));
 				}
@@ -364,17 +373,16 @@
 			}
 			
 			function Model(json, texture){
-				var mesh;
-				this.getMesh = function(){
-					return mesh;
-				};
+				this.mesh;
 				this.load = function(){
 					try{
 					loader.load( json, function ( geometry, materials ) {
+								//actual creation of model
 				        		var tex = THREE.ImageUtils.loadTexture(texture);
-								var mat = new THREE.MeshBasicMaterial({color:0xfffffff,map:tex, morphTargets: true});
+								var mat = new THREE.MeshBasicMaterial({color:0xfffffff, map:tex, morphTargets: true});
 								this.mesh = new THREE.Mesh( geometry, mat );
 								scene.add(this.mesh);
+								return mesh;
 					});
 				}catch(error){
 			        	console.log("error wloading models: "+error);
@@ -384,20 +392,17 @@
 			    this.loadMTL = function(){
 					try{
 					loader.load( json, function ( geometry, materials ) {
-								this.mesh = new THREE.Mesh( geometry, material[1] );
+								this.mesh = new THREE.Mesh( geometry, materials[0] );
 								scene.add(this.mesh);
 					});
 				}catch(error){
 			        	console.log("error wloading models: "+error);
 			        }
 			    };
-				}
-				
-				function removeModel(object) {
-    				var selectedObject = scene.getObjectByName(object.name);
-    				scene.remove( selectedObject );
-    				animate();
-				}
+			    this.getMesh = function(){
+					return mesh;
+				};
+			}
 		</script>
 	</body>
 </html>
