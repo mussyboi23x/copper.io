@@ -60,6 +60,7 @@
 	<body>
 		<!-- js librarys are imported here, NOT in game content scripts -->
 		<script src="js/three.js"></script>
+		<script src="js/physi.js"></script>
 		<script src="js/PointerLockControls.js"></script>
 		<script src="js/jquery.min.js"></script>
 		<script src="item.js"></script>
@@ -173,7 +174,6 @@
 
 			}
 
-
 			var controlsEnabled = false;
 
 			var moveForward = false;
@@ -187,11 +187,14 @@
 			var loader = new THREE.JSONLoader();
 			init();
 			animate();
+			
 			function init() {
+				Physijs.scripts.worker = 'js/physi.js';
+				Physijs.scripts.ammo = 'js/physijs_worker.js';
 
 				camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 1000 );
        
-				scene = new THREE.Scene();
+				scene = new Physijs.Scene();
 				scene.fog = new THREE.Fog( 0xffffff, 0, 750 );
 
 				controls = new THREE.PointerLockControls( camera );
@@ -261,7 +264,7 @@
 				document.addEventListener( 'keyup', onKeyUp, false );
 
 				// floor
-				/*
+				
 				geometry = new THREE.PlaneGeometry( 2000, 2000, 100, 100 );
 				geometry.rotateX( - Math.PI / 2 );
 				for ( var i = 0, l = geometry.vertices.length; i < l; i ++ ) {
@@ -282,17 +285,14 @@
 				}
 				material = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors } );
 				mesh = new THREE.Mesh( geometry, material );
-				//scene.add(mesh)
-				*/
+				scene.add(mesh)
+				
 				
 				var light = new THREE.AmbientLight( 0x404040 );
 				scene.add( light );
 				
-				var model = new Item(1, "p90", new Model("models/P90.json","models/P90.jpg"));
+			    model = new Item(1, "p90", new Model("models/P90.json","models/P90.jpg"));
 				model.loadModel();
-				model.editModel(function(Model){
-					console.log(Model.getMesh());
-				});
 				console.log(model);
 				console.log(model.getModel());
 				console.log(model.getModel().getMesh());
@@ -301,7 +301,8 @@
 		        
 				geometry = new THREE.CubeGeometry(10,1,10);
 				material = new THREE.MeshLambertMaterial({color : 0x000000});
-				PlayerMesh = new THREE.Mesh(geometry, material);
+				PlayerMesh = new Physijs.BoxMesh(geometry, material);
+				PlayerMesh.__dirtyPosition = true;
 				scene.add(PlayerMesh);
 
 				renderer = new THREE.WebGLRenderer();
@@ -363,25 +364,32 @@
 
 					}
 					//console.log(models2);
-					PlayerMesh.position = controls.position;
+					
+					if(model.getModel().getMesh() != undefined){
+					PlayerMesh.position.x = controls.getObject().position.x;
+					PlayerMesh.position.y = controls.getObject().position.y-7;
+					PlayerMesh.position.z = controls.getObject().position.z;	
+					}
 					prevTime = time;
-					document.getElementById("cords").innerHTML=("x: "+Math.floor(controls.getObject().position.x)+ " y: "+Math.floor(controls.getObject().position.y)+" z: "+Math.floor(controls.getObject().position.z));
+					document.getElementById("cords").innerHTML=("x: "+Math.floor(PlayerMesh.position.x)+ " y: "+Math.floor(controls.getObject().position.y)+" z: "+Math.floor(controls.getObject().position.z));
 				}
 
+				scene.simulate();
 				renderer.render( scene, camera );	
 				
 			}
 			
 			function Model(json, texture){
-				this.mesh;
+				this.mesh = this.mesh;
 				this.load = function(){
 					try{
 					loader.load( json, function ( geometry, materials ) {
-								//actual creation of model
 				        		var tex = THREE.ImageUtils.loadTexture(texture);
 								var mat = new THREE.MeshBasicMaterial({color:0xfffffff, map:tex, morphTargets: true});
-								this.mesh = new THREE.Mesh( geometry, mat );
-								scene.add(this.mesh);
+								mesh = new THREE.Mesh( geometry, mat );
+								mesh.castShadow=true
+							    console.log(mesh);
+								scene.add(mesh);
 								return mesh;
 					});
 				}catch(error){
@@ -392,8 +400,8 @@
 			    this.loadMTL = function(){
 					try{
 					loader.load( json, function ( geometry, materials ) {
-								this.mesh = new THREE.Mesh( geometry, materials[0] );
-								scene.add(this.mesh);
+								mesh = new THREE.Mesh( geometry, materials[0] );
+								scene.add(mesh);
 					});
 				}catch(error){
 			        	console.log("error wloading models: "+error);
@@ -402,6 +410,7 @@
 			    this.getMesh = function(){
 					return mesh;
 				};
+				
 			}
 		</script>
 	</body>

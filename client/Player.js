@@ -20,6 +20,6 @@ function player(){
         this.inventory.push(Item);
     }
     this.PosArray = function(){
-        return [this.posX, this.posY, this.posY]
+        return [this.posX, this.posY, this.posY];
     }
 }

@@ -9,6 +9,7 @@ function Item(id, name, model){
     this.name = name;
     this.loadModel = function(){
         model.load();
+
     };
     this.getModel = function(){
         return this.model;
@@ -57,8 +58,9 @@ function Item(id, name, model){
             }
         }
 	};
+}
 	
-	this.largestX = function(vertices, matrix){
+	function largestX(vertices, matrix){
 	    var x;
 	    for(var i = 0; i < vertices.length; i++){
 	        var vertex = matrix.multiplyVector3(vertices[i].clone());
@@ -66,9 +68,10 @@ function Item(id, name, model){
 	            x = vertex.x;
 	        }
 	    }
-	    return ;
-	}
-	this.smallestX = function(vertices, matrix){
+	    return x;
+	};
+	
+	function smallestX(vertices, matrix){
 	    var x;
 	    for(var i = 0; i < vertices.length; i++){
 	        var vertex = matrix.multiplyVector3(vertices[i].clone());
@@ -77,8 +80,8 @@ function Item(id, name, model){
 	        }
 	    }
 	    return x;
-	}
-	this.largestY = function(vertices, matrix){
+	};
+	function largestY(vertices, matrix){
 	    var y;
 	    for(var i = 0; i < vertices.length; i++){
 	        var vertex = matrix.multiplyVector3(vertices[i].clone());
@@ -87,8 +90,8 @@ function Item(id, name, model){
 	        }
 	    }
 	    return y;
-	}
-	this.smallestY = function(vertices, matrix){
+	};
+	function smallestY(vertices, matrix){
 	    var y;
 	    for(var i = 0; i < vertices.length; i++){
 	        var vertex = matrix.multiplyVector3(vertices[i].clone());
@@ -97,8 +100,8 @@ function Item(id, name, model){
 	        }
 	    }
 	    return y;
-	}
-	this.largestZ = function(vertices, matrix){
+	};
+	function largestZ(vertices, matrix){
 	    var z;
 	    for(var i = 0; i < vertices.length; i++){
 	        var vertex = matrix.multiplyVector3(vertices[i].clone());
@@ -107,8 +110,8 @@ function Item(id, name, model){
 	        }
 	    }
 	    return z;
-	}
-	this.smallestZ = function(vertices, matrix){
+	};
+	function smallestZ(vertices, matrix){
 	    var z;
 	    for(var i = 0; i < vertices.length; i++){
 	        var vertex = matrix.multiplyVector3(vertices[i].clone());
@@ -117,8 +120,7 @@ function Item(id, name, model){
 	        }
 	    }
 	    return z;
-	}
-}
+	};
 
 function ItemRegistry(){
     this.items = [];
