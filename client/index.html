@@ -1,431 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<title>copper</title>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-		<style>
-			html, body {
-				width: 100%;
-				height: 100%;
-			}
 
-			body {
-				background-color: #ffffff;
-				margin: 0;
-				overflow: hidden;
-				font-family: arial;
-			}
+<head>
+	<title>copper</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<style>
+		html,
+		body {
+			width: 100%;
+			height: 100%;
+		}
+		
+		body {
+			background-color: #ffffff;
+			margin: 0;
+			overflow: hidden;
+			font-family: arial;
+		}
+		
+		#blocker {
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			background-color: rgba(0, 0, 0, 0.5);
+		}
+		
+		#instructions {
+			width: 100%;
+			height: 100%;
+			display: -webkit-box;
+			display: -moz-box;
+			display: box;
+			-webkit-box-orient: horizontal;
+			-moz-box-orient: horizontal;
+			box-orient: horizontal;
+			-webkit-box-pack: center;
+			-moz-box-pack: center;
+			box-pack: center;
+			-webkit-box-align: center;
+			-moz-box-align: center;
+			box-align: center;
+			color: #ffffff;
+			text-align: center;
+			cursor: pointer;
+		}
+	</style>
+</head>
 
-			#blocker {
+<body>
+	<!-- js librarys are imported here, NOT in game content scripts -->
+	<div id="blocker">
 
-				position: absolute;
-
-				width: 100%;
-				height: 100%;
-
-				background-color: rgba(0,0,0,0.5);
-
-			}
-			#instructions {
-
-				width: 100%;
-				height: 100%;
-
-				display: -webkit-box;
-				display: -moz-box;
-				display: box;
-
-				-webkit-box-orient: horizontal;
-				-moz-box-orient: horizontal;
-				box-orient: horizontal;
-
-				-webkit-box-pack: center;
-				-moz-box-pack: center;
-				box-pack: center;
-
-				-webkit-box-align: center;
-				-moz-box-align: center;
-				box-align: center;
-
-				color: #ffffff;
-				text-align: center;
-
-				cursor: pointer;
-
-			}
-
-		</style>
-	</head>
-	<body>
-		<!-- js librarys are imported here, NOT in game content scripts -->
-		<script src="js/three.js"></script>
-		<script src="js/physi.js"></script>
-		<script src="js/PointerLockControls.js"></script>
-		<script src="js/jquery.min.js"></script>
-		<script src="item.js"></script>
-		<script src="Player.js"></script>
-		<div id="cords" style="color: #ffffff; background-color: #000000"></div>
-		<div id="blocker">
-
-			<div id="instructions">
-				<span style="font-size:40px">Click to play</span>
-				<br />
-				(W, A, S, D or arrow keys = Move, SPACE = Jump, MOUSE = Look around)
-			</div>
-
+		<div id="instructions">
+			<span style="font-size:40px">Click to play</span>
+			<br /> (W, A, S, D or arrow keys = Move, SPACE = Jump, MOUSE = Look around, F to interact, right mouse for swing right, ect)
+			<br /><set onclick="alert(0)">Settings 	</set> <quit onclick="alert(0)">Quit</quit>
 		</div>
 
-		<script>
-			var camera, scene, renderer;
-			var geometry, material, mesh;
-			var controls;
-    		var mass = 50;
-			var p90;
-			var PlayerMesh;
+	</div>
+	<script src="js/three.js"></script>
+	<script src="js/physi.js"></script>
+	<script src="js/PointerLockControls.js"></script>
+	<script src="js/jquery.min.js"></script>
+	<script src="item.js"></script>
+	<script src="player.js"></script>
+	<script src="Main.js"></script>
+	<script>
+		Index = this;
+		//init player (test)
+		var player = new player("bob",0,5,20);
+		//and let there be light!
+		var light = new THREE.AmbientLight(0x404040);
+		scene.add(light);
+		
+		//add p90
+		//var p90 = new Item("p90", new ModelBase("models/P90.json", "models/P90.jpg"));
+		var f16 = new Item("f16", new ModelBase("models/f16.json", "models/f16.bmp"));
+		//var knife = new Item("knife", new ModelBase("models/knife.json", "models/f16.bmp"));
+		//add floor (this is just a three mesh.)
+		//console.log(p90)
+		//console.log(f16)
+		//console.log(knife)
+		
+		geometry = new THREE.CubeGeometry(50, 5, 50);
+		material = Physijs.createMaterial(new THREE.MeshBasicMaterial({color: 0x66CCFE}), 0.9, 0.1);
+		floor = new Physijs.BoxMesh(geometry, material, 0);
+		floor.__dirtyPosition = true;
+		scene.add(floor);
+		//player
+		console.log(controlsEnabled)
+	</script>
+</body>
 
-			var blocker = document.getElementById( 'blocker' );
-			var instructions = document.getElementById( 'instructions' );
-
-
-			var havePointerLock = 'pointerLockElement' in document || 'mozPointerLockElement' in document || 'webkitPointerLockElement' in document;
-
-			if ( havePointerLock ) {
-
-				var element = document.body;
-
-				var pointerlockchange = function ( event ) {
-
-					if ( document.pointerLockElement === element || document.mozPointerLockElement === element || document.webkitPointerLockElement === element ) {
-
-						controlsEnabled = true;
-						controls.enabled = true;
-
-						blocker.style.display = 'none';
-
-					} else {
-
-						controls.enabled = false;
-
-						blocker.style.display = '-webkit-box';
-						blocker.style.display = '-moz-box';
-						blocker.style.display = 'box';
-
-						instructions.style.display = '';
-
-					}
-
-				};
-
-				var pointerlockerror = function ( event ) {
-
-					instructions.style.display = '';
-
-				};
-
-				// Hook pointer lock state change events
-				document.addEventListener( 'pointerlockchange', pointerlockchange, false );
-				document.addEventListener( 'mozpointerlockchange', pointerlockchange, false );
-				document.addEventListener( 'webkitpointerlockchange', pointerlockchange, false );
-
-				document.addEventListener( 'pointerlockerror', pointerlockerror, false );
-				document.addEventListener( 'mozpointerlockerror', pointerlockerror, false );
-				document.addEventListener( 'webkitpointerlockerror', pointerlockerror, false );
-
-				instructions.addEventListener( 'click', function ( event ) {
-
-					instructions.style.display = 'none';
-
-					// Ask the browser to lock the pointer
-					element.requestPointerLock = element.requestPointerLock || element.mozRequestPointerLock || element.webkitRequestPointerLock;
-
-					if ( /Firefox/i.test( navigator.userAgent ) ) {
-
-						var fullscreenchange = function ( event ) {
-
-							if ( document.fullscreenElement === element || document.mozFullscreenElement === element || document.mozFullScreenElement === element ) {
-
-								document.removeEventListener( 'fullscreenchange', fullscreenchange );
-								document.removeEventListener( 'mozfullscreenchange', fullscreenchange );
-
-								element.requestPointerLock();
-							}
-
-						};
-
-						document.addEventListener( 'fullscreenchange', fullscreenchange, false );
-						document.addEventListener( 'mozfullscreenchange', fullscreenchange, false );
-
-						element.requestFullscreen = element.requestFullscreen || element.mozRequestFullscreen || element.mozRequestFullScreen || element.webkitRequestFullscreen;
-
-						element.requestFullscreen();
-
-					} else {
-
-						element.requestPointerLock();
-
-					}
-
-				}, false );
-
-			} else {
-
-				instructions.innerHTML = 'Your browser doesn\'t seem to support Pointer Lock API';
-
-			}
-
-			var controlsEnabled = false;
-
-			var moveForward = false;
-			var moveBackward = false;
-			var moveLeft = false;
-			var moveRight = false;
-			var canJump = false;
-
-			var prevTime = performance.now();
-			var velocity = new THREE.Vector3();
-			var loader = new THREE.JSONLoader();
-			init();
-			
-			function init() {
-				Physijs.scripts.worker = 'js/physijs_worker.js';
-				Physijs.scripts.ammo = 'js/physi.js';
-
-				camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 1, 1000 );
-       
-				scene = new THREE.Scene();
-				//scene.fog = new THREE.FogExp2( 0xffffff, 0.0000000000002);
-
-				controls = new THREE.PointerLockControls( camera );
-				scene.add( controls.getObject() );
-
-				var onKeyDown = function ( event ) {
-
-					switch ( event.keyCode ) {
-
-						case 87: // w
-							moveForward = true;
-							break;
-						case 65: // a
-							moveLeft = true; 
-							break;
-						case 83: // s
-							moveBackward = true;
-							break;
-						case 68: // d
-							moveRight = true;
-							break;
-
-						case 32: // space
-							if ( canJump === true ) velocity.y += 350;
-							canJump = false;
-							break;
-
-					}
-
-				};
-
-				var onKeyUp = function ( event ) {
-
-					switch( event.keyCode ) {
-
-						case 38: // up
-						case 87: // w
-							moveForward = false;
-							break;
-
-						case 37: // left
-						case 65: // a
-							moveLeft = false;
-							break;
-
-						case 40: // down
-						case 83: // s
-							moveBackward = false;
-							break;
-
-						case 39: // right
-						case 68: // d
-							moveRight = false;
-							break;
-
-					}
-
-				};
-
-				document.addEventListener( 'keydown', onKeyDown, false );
-				document.addEventListener( 'keyup', onKeyUp, false );
-
-				// floor
-				
-				geometry = new THREE.PlaneGeometry( 2000, 2000, 100, 100 );
-				geometry.rotateX( - Math.PI / 2 );
-				for ( var i = 0, l = geometry.vertices.length; i < l; i ++ ) {
-
-					var vertex = geometry.vertices[ i ];
-					vertex.x += Math.random() * 20 - 10;
-					vertex.y += Math.random() * 2;
-					vertex.z += Math.random() * 20 - 10;
-
-				}
-
-				for ( var i = 0, l = geometry.faces.length; i < l; i ++ ) {
-
-					var face = geometry.faces[ i ];
-					face.vertexColors[ 0 ] = new THREE.Color().setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
-					face.vertexColors[ 1 ] = new THREE.Color().setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
-					face.vertexColors[ 2 ] = new THREE.Color().setHSL( Math.random() * 0.3 + 0.5, 0.75, Math.random() * 0.25 + 0.75 );
-				}
-				material = new THREE.MeshBasicMaterial( { vertexColors: THREE.VertexColors } );
-				mesh = new THREE.Mesh( geometry, material );
-				scene.add(mesh)
-				
-				
-				var light = new THREE.AmbientLight( 0x404040 );
-				scene.add( light );
-				
-				p90 = new Item(1, "p90", new Model("models/P90.json","models/P90.jpg"));
-				p90.loadModel();
-		        //player
-		        
-				geometry = new THREE.CubeGeometry(10,1,10);
-				material = new THREE.MeshLambertMaterial({color : 0x000000});
-				PlayerMesh = new Physijs.BoxMesh(geometry, material);
-				PlayerMesh.__dirtyPosition = true;
-				scene.add(PlayerMesh);
-
-				renderer = new THREE.WebGLRenderer();
-				renderer.setClearColor( 0xffffff );
-				renderer.setPixelRatio( window.devicePixelRatio );
-				renderer.setSize( window.innerWidth, window.innerHeight );
-				document.body.appendChild( renderer.domElement );
-
-				
-				window.addEventListener( 'resize', onWindowResize, false );
-				//animation trigger!
-				animate();
-
-			}
-			
-
-			function onWindowResize() {
-
-				camera.aspect = window.innerWidth / window.innerHeight;
-				camera.updateProjectionMatrix();
-
-				renderer.setSize( window.innerWidth, window.innerHeight );
-
-
-			}
-			
-			/**
-			 * runs when world changes and anamation is needed
-			 *
-			 */
-
-
-			function animate() {
-
-				//requestAnimationFrame( animate ););
-				//setInterval(animate(), 1000);
-				if ( controlsEnabled ) {  
-					var time = performance.now();
-					var delta = ( time - prevTime ) / 1000;
-					velocity.x -= velocity.x * 10.0 * delta;
-					velocity.z -= velocity.z * 10.0 * delta;
-					velocity.y -= 9.8 * mass * delta;
-
-					if ( moveForward ) velocity.z -= 400.0 * delta;
-					if ( moveBackward ) velocity.z += 400.0 * delta; 
-
-					if ( moveLeft ) velocity.x -= 400.0 * delta;
-					if ( moveRight ) velocity.x += 400.0 * delta;
-					controls.getObject().translateX( velocity.x * delta );
-					controls.getObject().translateY( velocity.y * delta );
-					controls.getObject().translateZ( velocity.z * delta );
-					
-					if ( controls.getObject().position.y < 10 ) {
-						velocity.y = 0;
-						controls.getObject().position.y = 10;
-
-						canJump = true;
-					
-					}
-					
-					if(p90.getModel().getMesh() != undefined){
-						PlayerMesh.position.x = controls.getObject().position.x;
-						PlayerMesh.position.y = controls.getObject().position.y-7;
-						PlayerMesh.position.z = controls.getObject().position.z;	
-					}
-					
-					p90.meshFunc(function(model){
-						model.getMesh().position.x = controls.getObject().position.x;
-						
-					});
-					prevTime = time;
-					document.getElementById("cords").innerHTML=("x: "+Math.floor(PlayerMesh.position.x)+ " y: "+Math.floor(controls.getObject().position.y)+" z: "+Math.floor(controls.getObject().position.z));
-				}
-
-				renderer.render( scene, camera );
-				//EXPERIMENTAL!!! replace with accual animation request code.
-				setTimeout(function(){animate();}, 20);
-				
-			}
-			/**
-			 * json is the url to a json model file
-			 * testure is a url to a jpeg
-			 *  pos is the xyz pos of the model with the THREE.Vector3 object
-			**/
-			function Model(json, texture){
-				this.mesh;
-				this.load = function(){
-					try{
-					loader.load( json, function ( geometry, materials ) {
-				        		var tex = THREE.ImageUtils.loadTexture(texture);
-								var mat = new THREE.MeshBasicMaterial({color:0xfffffff, map:tex, morphTargets: true});
-								mesh = new THREE.Mesh( geometry, mat );
-								mesh.castShadow=true;
-								//mesh.position = pos;
-								scene.add(mesh);
-								return mesh;
-					});
-				}catch(error){
-			        	console.log("error wloading models: "+error);
-			        }
-			    };
-				this.loadWithFunc = function(func){
-					try{
-					loader.load( json, function ( geometry, materials ) {
-				        		var tex = THREE.ImageUtils.loadTexture(texture);
-								var mat = new THREE.MeshBasicMaterial({color:0xfffffff, map:tex, morphTargets: true});
-								mesh = new THREE.Mesh( geometry, mat );
-								mesh.castShadow=true;
-								func(mesh);
-								//mesh.position = pos;
-								scene.add(mesh);
-								return mesh;
-					});
-				}catch(error){
-			        	console.log("error wloading models: "+error);
-			        }
-			    };
-			    //attempt mtl texture load
-			    this.loadMTL = function(){
-					try{
-					loader.load( json, function ( geometry, materials ) {
-								mesh = new THREE.Mesh( geometry, materials[0] );
-								scene.add(mesh);
-					});
-				}catch(error){
-			        	console.log("error wloading models: "+error);
-			        }
-			    };
-			    this.getMesh = function(){
-					return mesh;
-				};
-				
-			}
-		</script>
-	</body>
 </html>
-		<!-- none-library scripts dont go in the js folder and are imported here, however they should be imported by the player-->

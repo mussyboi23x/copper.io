@@ -7,7 +7,8 @@ THREE.PointerLockControls = function ( camera ) {
 	var scope = this;
 
 	camera.rotation.set( 0, 0, 0 );
-
+	this.MouseX = 0;
+	this.MouseY = 0;
 	var pitchObject = new THREE.Object3D();
 	pitchObject.add( camera );
 
@@ -23,10 +24,11 @@ THREE.PointerLockControls = function ( camera ) {
 
 		var movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
 		var movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
-
+		scope.MouseX = ( event.clientX / window.innerWidth ) * 2 - 1;
+		scope.MouseY = - ( event.clientY / window.innerHeight ) * 2 + 1;	
 		yawObject.rotation.y -= movementX * 0.002;
 		pitchObject.rotation.x -= movementY * 0.002;
-
+		console.log("moved");
 		pitchObject.rotation.x = Math.max( - PI_2, Math.min( PI_2, pitchObject.rotation.x ) );
 
 	};
