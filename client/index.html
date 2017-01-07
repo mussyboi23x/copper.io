@@ -11,21 +11,21 @@
 			width: 100%;
 			height: 100%;
 		}
-		
+
 		body {
 			background-color: #ffffff;
 			margin: 0;
 			overflow: hidden;
 			font-family: arial;
 		}
-		
+
 		#blocker {
 			position: absolute;
 			width: 100%;
 			height: 100%;
 			background-color: rgba(0, 0, 0, 0.5);
 		}
-		
+
 		#instructions {
 			width: 100%;
 			height: 100%;
@@ -63,33 +63,26 @@
 	<script src="js/physi.js"></script>
 	<script src="js/PointerLockControls.js"></script>
 	<script src="js/jquery.min.js"></script>
-	<script src="item.js"></script>
+	<script src="Item.js"></script>
 	<script src="player.js"></script>
 	<script src="Main.js"></script>
+	<script src="Gravity.js"></script>
+	<script src="Model.js"></script>
 	<script>
 		Index = this;
-		//init player (test)
 		var player = new player("bob",0,5,20);
-		//and let there be light!
 		var light = new THREE.AmbientLight(0x404040);
 		scene.add(light);
-		
-		//add p90
-		//var p90 = new Item("p90", new ModelBase("models/P90.json", "models/P90.jpg"));
-		var f16 = new Item("f16", new ModelBase("models/f16.json", "models/f16.bmp"));
-		//var knife = new Item("knife", new ModelBase("models/knife.json", "models/f16.bmp"));
-		//add floor (this is just a three mesh.)
-		//console.log(p90)
-		//console.log(f16)
-		//console.log(knife)
-		
+
+		var f16 = new Item("f16", new ModelBase("models/shuttle.json", "models/f16.bmp", new THREE.Vector3(0, 90, 0)));
+		var gravitypoint = new GravityPoint(0,10,0);
+
 		geometry = new THREE.CubeGeometry(50, 5, 50);
 		material = Physijs.createMaterial(new THREE.MeshBasicMaterial({color: 0x66CCFE}), 0.9, 0.1);
 		floor = new Physijs.BoxMesh(geometry, material, 0);
 		floor.__dirtyPosition = true;
 		scene.add(floor);
 		//player
-		console.log(controlsEnabled)
 	</script>
 </body>
 

@@ -67,7 +67,6 @@ function playerModel(camera, pos, owner) {
         this.mesh.position.set(this.position.x, this.position.y, this.position.z);
         this.mesh.add(camera);
         this.enabled = true;
-        console.log(this.mesh);
     }
     this.createMesh();
     camera.rotation.set(0, 0, 0);
@@ -79,14 +78,8 @@ function playerModel(camera, pos, owner) {
             var movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
             owner.MouseX = (event.clientX / window.innerWidth) * 2 - 1;
             owner.MouseY = -(event.clientY / window.innerHeight) * 2 + 1;
-            //player.model().__dirtyPosition = true;
-			//player.model().__dirtyRotation = true;
             camera.rotation.y -= movementX * 0.002;
             camera.rotation.x -= movementY * 0.002;
-            //Index.player.model().rotation.x -= movementY * 0.002
-            //camera.rotation.z -= movementY * 0.002;
-            console.log("moved");
-            //camera.rotation.z = Math.max(-PI_2, Math.min(PI_2, camera.rotation.x));
         }
 
     };

@@ -1,15 +1,27 @@
 			//Start physijs 
 			Physijs.scripts.worker = 'js/physijs_worker.js';
 			Physijs.scripts.ammo = 'ammo.js';
-			var UnloadedModels = [];
 			var camera, scene, renderer;
 			var controls;
+			var Main = this;
+			var objects = [];
 			var blocker = document.getElementById('blocker');
 			var instructions = document.getElementById('instructions');
-
-
 			var havePointerLock = 'pointerLockElement' in document || 'mozPointerLockElement' in document || 'webkitPointerLockElement' in document;
-
+			var controlsEnabled = false;
+			var moveForward = false;
+			var moveBackward = false;
+			var moveLeft = false;
+			var moveRight = false;
+			var moveup = false;
+			var movedown = false;
+			var Interact = false;
+			var raycaster = THREE.Raycaster();
+			var prevTime = performance.now();
+			var velocity = new THREE.Vector3();
+			var loaderJson = new THREE.JSONLoader();
+			var loaderTexture = new THREE.TextureLoader();
+			var millcouter = 0;
 			if (havePointerLock) {
 
 				var element = document.body;
@@ -96,19 +108,6 @@
 				instructions.innerHTML = "Oops! Incompatable browser. Try chrome or firefox?";
 
 			}
-
-			var controlsEnabled = false;
-			var moveForward = false;
-			var moveBackward = false;
-			var moveLeft = false;
-			var moveRight = false;
-			var moveup = false;
-			var movedown = false;
-			var Interact = false;
-			raycaster = THREE.Raycaster();
-			var prevTime = performance.now();
-			var velocity = new THREE.Vector3();
-			var loader = new THREE.JSONLoader();
 			init();
 
 			function init() {
@@ -117,7 +116,9 @@
 				scene = new Physijs.Scene({
 					fixedTimeStep: .01
 				});
-				var gravity = new THREE.Vector3(0, -30, 0);
+				
+				//var gravity = new THREE.Vector3(0, 0, 0);
+				//scene.setGravity(gravity);
 
 				scene.addEventListener("update", function() {
 					scene.simulate(undefined, 1);
@@ -226,20 +227,14 @@
 					var time = performance.now();
 					var delta = (time - prevTime) / 1000;
 					var Multiplyer = 15;
-					velocity.x -= velocity.x * Multiplyer * delta;
-					velocity.z -= velocity.z * Multiplyer * delta;
+					// velocity.x -= velocity.x * Multiplyer * delta;
+					// velocity.z -= velocity.z * Multiplyer * delta;
 					velocity.y -= velocity.y * Multiplyer * delta;
-					// if (moveForward) velocity.z -= Multiplyer * delta;
-					// if (moveBackward) velocity.z += Multiplyer * delta;
-					// if (moveLeft) velocity.x -= Multiplyer * delta;
-					// if (moveRight) velocity.x += Multiplyer * delta;
 					if (moveup) velocity.y += Multiplyer * delta;
 					if (movedown) velocity.y -= Multiplyer * delta;
 					player.model().__dirtyPosition = true;
 					player.model().__dirtyRotation = true;
-					// player.model().translateX(velocity.x * delta);
 					player.model().translateY(velocity.y * delta);
-					// player.model().translateZ(velocity.z * delta);
 					if (moveForward) {
 						var direction = camera.getWorldDirection();
 						direction.y = 0;
@@ -249,27 +244,13 @@
 					//The following code SHOULD be moved to the player class
 					var selected = getPointedObject(camera);
 					if (selected != undefined) {
-						/*
-						if (Interact) {
-							if (selected.object == player) {
-								//selected.object.setAngularVelocity(new THREE.Vector3(10, 0, 0));
-							}
-							if (selected.object == extrasphere) {
-								//selected.object.setAngularVelocity(new THREE.Vector3(0, 0, 10));
-							}
-						}
-						*/
+						
 					}
-
+					//Index.gravitypoint.update();
 				}
 
 				renderer.render(scene, camera);
 				//EXPERIMENTAL!!! replace with accual animation request code.
-				for (i in UnloadedModels) {
-					console.log(UnloadedModels[i]);
-					UnloadedModels[i].load();
-					UnloadedModels.pop(i);
-				}
 				setTimeout(function() {
 					animate();
 				}, 20);
