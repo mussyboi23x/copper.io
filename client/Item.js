@@ -30,9 +30,9 @@ MainItemRegistry = new ItemRegistry();
  *contains the json and texture url
  * can/should be indexed/added to a array for
  * quick use of a known item
- * 
+ *
  * json - string
- * 
+ *
  * texture - string
  */
 function ModelBase(json, texture) {
@@ -43,31 +43,31 @@ function ModelBase(json, texture) {
  *contains the json and texture url
  * can/should be indexed/added to a array for
  * quick use of a known item
- * 
+ *
  * json - string
- * 
+ *
  * texture - string
- * 
+ *
  * positsion in world
  */
 function ModelBase(json, texture, pos) {
     this.json = json;
     this.texture = texture;
     this.pos = pos;
-    
+
     this.getPos = function(){
-      return this.pos;  
+      return this.pos;
     };
 }
 /**
  *contains the THREE geometry and texture url
  * can/should be indexed/added to a array for
  * quick use of a known item
- * 
+ *
  * geometry - Three.geometry (any)
- * 
+ *
  * texture - string
- * 
+ *
  * positsion in world
  */
 function GeometryBase(geometry, texture) {
@@ -80,14 +80,13 @@ function GeometryBase(geometry, texture, pos) {
     this.pos = pos;
 }
 /**
- * technically a ItemModel, it uses a model to form a object, and 
- * puts the model into the UnloadedModels array to wait for the next animation 
+ * technically a ItemModel, it uses a model to form a object, and
+ * puts the model into the UnloadedModels array to wait for the next animation
  * frame to add it.
  */
 function Item(name, modelBase) {
     this.name = name;
     this.model = new Model(modelBase);
-    this.model.load();
     this.name = name;
 
     this.loadModel = function() {
@@ -123,51 +122,8 @@ function Item(name, modelBase) {
         return this.getMesh().position;
     }
 }
-/*
-function Item(name, modelBase, pos) {
-
-    this.loadModel = function() {
-        this.model.load();
-    };
-    this.getModel = function() {
-        return this.model;
-    };
-    this.getMesh = function() {
-        return this.model.getMesh();
-    };
-    this.getName = function() {
-        return this.name;
-    };
-    this.setAction = function(code) {
-        this.action = code();
-    };
-    this.doAction = function() {
-        if (this.action() != undefined) {
-            this.action();
-        }
-    };
-    this.removeModel = function(scene) {
-        scene.remove(this.model.getMesh());
-    };
-    this.meshFunc = function(edits) {
-        edits(this.getModel());
-    };
-    this.setMeshPos = function(x, y, z) {
-        this.getMesh().positsion = THREE.Vector3(x, y, z);
-    }
-    this.getPos = function() {
-        return this.getMesh().position;
-    }
-    this.name = name;
-    this.uid = MainItemRegistry.getNewUID();
-    this.model = new Model(modelBase, this.uid);
-    this.model.load();
-    console.log(this.getModel().mesh);
-    this.name = name;
-}
-*/
 /**
- *ItemGeometry is similar to Item, but instead of using a ModelBase, it uses a Geometrybase Object 
+ *ItemGeometry is similar to Item, but instead of using a ModelBase, it uses a Geometrybase Object
  */
 function ItemGeometry(name, GeometryBase){
     this.name = name;
