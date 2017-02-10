@@ -12,54 +12,32 @@ function Model(ModelBase) {
 
 }
 
-function loadJSON(ModelBase, Texture) {
-    var root = this;
-    var Mesh;
-    var Texture = loadTexture(ModelBase);
-    Main.loaderJson.load(ModelBase.json, function(geometry, materials) {
-        var mat = new Physijs.createMaterial(new THREE.MeshLambertMaterial({
-            map: Texture,
-            morphTargets: true
-        }), 0.3, 0.3);
-        console.log(mat);
-        var Mesh = new Physijs.ConvexMesh(geometry, mat);
-        Main.scene.add(Mesh.map)
-        return Mesh;
-    });
-    return Mesh
-}
-
 function loadJSON(ModelBase) {
-    var Texture = loadTexture(ModelBase);
+    var texture = loadTexture(ModelBase.texture);
+    var mat;
+    var Mat;
+    var Mesh;
     Main.loaderJson.load(ModelBase.json, function(geometry, materials) {
-        for (i in materials){
-
-        }
-        materials[0].map = Texture;
-        materials[0].morphTargets = true;
-        console.log("asddf")
-        var mat = new Physijs.createMaterial(materials[0], 0.3, 0.3);
-        console.log(mat);
-        console.log(mat.map);
-        var Mesh = new Physijs.ConvexMesh(geometry, mat);
-        Main.scene.add(Mesh)
-        return Mesh;
+      if(materials != undefined){
+          for (i in materials){
+            i.map = texture;
+            i.morphTargets = true;
+          }
+          if (materials.length > 1){
+            mat = new THREE.MultiMaterial(materials);
+          }else if (materials.length == 1) {
+            mat = materials[0];
+          }
+      }else{
+        mat = new THREE.MeshBasicMaterial({map: texture, morphTargets: true});
+      }
+      Mat = Physijs.createMaterial(mat, 0.3, 0.3);
+      Mesh = new Physijs.ConvexMesh(geometry, Mat);
+      Main.scene.add(Mesh);
+      return Mesh;
     });
 }
 
-function loadTexture(ModelBase) {
-    return Main.loaderTexture.load(ModelBase.texture);
-}
-/*
-function loadTexture(url) {
-    Main.loaderTexture.load(url,
-        function(texture) {
-            return texture;
-        }
-    );
-}
-*/
-
-function loadItem() {
-
+function loadTexture(texture) {
+    return Main.loaderTexture.load(texture);
 }
