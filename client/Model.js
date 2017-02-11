@@ -6,38 +6,26 @@
 function Model(ModelBase) {
     this.root = this;
     this.mesh = loadJSON(ModelBase);
-    this.load = function() {
-        Main.scene.add(mesh.model)
-    }
-
 }
 
 function loadJSON(ModelBase) {
-    var texture = loadTexture(ModelBase.texture);
-    var mat;
-    var Mat;
-    var Mesh;
-    Main.loaderJson.load(ModelBase.json, function(geometry, materials) {
-      if(materials != undefined){
-          for (i in materials){
-            i.map = texture;
-            i.morphTargets = true;
-          }
-          if (materials.length > 1){
-            mat = new THREE.MultiMaterial(materials);
-          }else if (materials.length == 1) {
-            mat = materials[0];
-          }
-      }else{
-        mat = new THREE.MeshBasicMaterial({map: texture, morphTargets: true});
+  var texturePath = "models/" //temperary
+  Main.loader.setTexturePath(texturePath);
+  Main.loader.load(ModelBase.json, function(geometry, materials){
+      var material;
+      if(materials == undefined || materials.length == 0){
+        material = new MeshBasicMaterial();
+      }else if(materials.length == 1){
+        material = materials[0];
+      }else if(materials.length > 1){
+        material = new THREE.MultiMaterial(materials);
       }
-      Mat = Physijs.createMaterial(mat, 0.3, 0.3);
-      Mesh = new Physijs.ConvexMesh(geometry, Mat);
-      Main.scene.add(Mesh);
-      return Mesh;
-    });
-}
 
-function loadTexture(texture) {
-    return Main.loaderTexture.load(texture);
+      var Material = Physijs.createMaterial(material, 0.3, 0.3);
+      var mesh = new Physijs.ConvexMesh(geomentry, Material);
+      mesh.position.set( x, y, z );
+      mesh.__dirtyPosition = true;
+      Main.scene.add(mesh);
+      return mesh;
+  });
 }
