@@ -63,19 +63,20 @@
 	<script src="js/physi.js"></script>
 	<script src="js/PointerLockControls.js"></script>
 	<script src="js/jquery.min.js"></script>
+	<script src="js/ColladaLoader.js"></script>
 	<script src="Item.js"></script>
 	<script src="player.js"></script>
 	<script src="Main.js"></script>
 	<script src="Gravity.js"></script>
 	<script src="Model.js"></script>
+	<script src="Registry.js"></script>
 	<script>
 		Index = this;
 		var player = new player("bob",0,5,20);
 		var light = new THREE.AmbientLight(0x404040);
 		scene.add(light);
 
-		var p90 = new Item("p90", new ModelBase("models/P90.json", "models/P90.jpg", new THREE.Vector3(0, 90, 0)));
-		var gravitypoint = new GravityPoint(0,10,0);
+		var f16 = new Item("models/monster.dae", new THREE.Vector3(0, 90, 0));
 
 		geometry = new THREE.CubeGeometry(50, 5, 50);
 		material = Physijs.createMaterial(new THREE.MeshBasicMaterial({color: 0x66CCFE}), 0.9, 0.1);

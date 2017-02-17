@@ -20,6 +20,7 @@
 			var prevTime = performance.now();
 			var velocity = new THREE.Vector3();
 			var loaderJson = new THREE.JSONLoader();
+			var loaderCollada = new THREE.ColladaLoader();
 			var loaderTexture = new THREE.TextureLoader();
 			var millcouter = 0;
 			if (havePointerLock) {
@@ -105,9 +106,9 @@
 			    instructions.innerHTML = "Oops! Incompatable browser. Try chrome or firefox?";
 
 			}
-			init();
+			setup();
 
-			function init() {
+			function setup() {
 
 			    camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, .001, 1000);
 			    scene = new Physijs.Scene({
@@ -201,7 +202,7 @@
 			    window.addEventListener('resize', onWindowResize, false);
 			    //animation trigger!
 			    scene.simulate();
-			    animate();
+			    window.requestAnimationFrame(animate);
 			}
 
 
@@ -214,9 +215,9 @@
 
 
 			}
-
 			/**
 			 * runs when world changes and anamation is needed
+			 * should only be invoked by AnimationRequest
 			 */
 			function animate() {
 			    //setInterval(animate(), 1000);
